@@ -17,4 +17,5 @@
 import TodoBackendDataLayer
 
 public struct DataLayer: TodoBackendDataLayer.DataLayer {
+    public init() {}
 }
