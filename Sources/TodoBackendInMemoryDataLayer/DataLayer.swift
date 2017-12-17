@@ -16,5 +16,5 @@
 
 import TodoBackendDataLayer
 
-struct DataLayer: TodoBackendDataLayer.DataLayer {
+public struct DataLayer: TodoBackendDataLayer.DataLayer {
 }
