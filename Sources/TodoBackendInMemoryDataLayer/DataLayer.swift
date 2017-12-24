@@ -26,11 +26,28 @@ public struct DataLayer: TodoBackendDataLayer.DataLayer {
         completion(Result.success(Array(todos.values)))
     }
 
+    public func get(id: String, completion: (Result<Todo>) -> Void) {
+        guard let todo = todos[id] else {
+            return completion(Result.failure(.todoNotFound))
+        }
+        completion(Result.success(todo))
+    }
+
     public mutating func add(title: String, order: Int?, completed: Bool,
                              completion: (Result<Todo>) -> Void) {
         let id = idGenerator.generate()
         let todo = TodoImplementation(id: id, title: title, order: order, completed: completed)
         todos[id] = todo
         completion(Result.success(todo))
+    }
+
+    public mutating func delete(id: String, completion: (Result<Void>) -> Void) {
+        todos[id] = nil
+        completion(Result.success(()))
+    }
+
+    public mutating func delete(completion: (Result<Void>) -> Void) {
+        todos.removeAll()
+        completion(Result.success(()))
     }
 }
