@@ -23,7 +23,7 @@ public struct DataLayer: TodoBackendDataLayer.DataLayer {
     private var todos: [String: TodoImplementation] = [String: TodoImplementation]()
 
     public func get(completion: (Result<[Todo]>) -> Void) {
-        completion(Result.Success(Array(todos.values)))
+        completion(Result.success(Array(todos.values)))
     }
 
     public mutating func add(title: String, order: Int, completed: Bool,
@@ -31,6 +31,6 @@ public struct DataLayer: TodoBackendDataLayer.DataLayer {
         let id = idGenerator.generate()
         let todo = TodoImplementation(id: id, title: title, order: order, completed: completed)
         todos[id] = todo
-        completion(Result.Success(todo))
+        completion(Result.success(todo))
     }
 }
