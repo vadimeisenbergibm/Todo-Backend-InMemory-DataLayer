@@ -16,7 +16,7 @@
 
 import TodoBackendDataLayer
 
-public struct DataLayer: TodoBackendDataLayer.DataLayer {
+public class DataLayer: TodoBackendDataLayer.DataLayer {
     public init() {}
 
     private var idGenerator = IDGenerator()
@@ -33,7 +33,7 @@ public struct DataLayer: TodoBackendDataLayer.DataLayer {
         completion(Result.success(todo))
     }
 
-    public mutating func add(title: String, order: Int?, completed: Bool,
+    public func add(title: String, order: Int?, completed: Bool,
                              completion: (Result<Todo>) -> Void) {
         let id = idGenerator.generate()
         let todo = TodoImplementation(id: id, title: title, order: order, completed: completed)
@@ -41,12 +41,12 @@ public struct DataLayer: TodoBackendDataLayer.DataLayer {
         completion(Result.success(todo))
     }
 
-    public mutating func delete(id: String, completion: (Result<Void>) -> Void) {
+    public func delete(id: String, completion: (Result<Void>) -> Void) {
         todos[id] = nil
         completion(Result.success(()))
     }
 
-    public mutating func delete(completion: (Result<Void>) -> Void) {
+    public func delete(completion: (Result<Void>) -> Void) {
         todos.removeAll()
         completion(Result.success(()))
     }
