@@ -16,7 +16,7 @@
 
 struct IDGenerator {
     private var nextInteger = 0
-    mutating func generateID() -> String {
+    mutating func generate() -> String {
         let result = "\(nextInteger)"
         nextInteger += 1
         return result
