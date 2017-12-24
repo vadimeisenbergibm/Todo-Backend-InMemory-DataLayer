@@ -50,4 +50,18 @@ public class DataLayer: TodoBackendDataLayer.DataLayer {
         todos.removeAll()
         completion(Result.success(()))
     }
+
+    public func update(id: String, title: String?, order: Int?, completed: Bool?,
+                       completion: (Result<Todo>) -> Void) {
+        guard var todo = todos[id] else {
+            return completion(Result.failure(.todoNotFound))
+        }
+
+        todo.title = title ?? todo.title
+        todo.order = order ?? todo.order
+        todo.completed = completed ?? todo.completed
+
+        todos[id] = todo
+        completion(Result.success(todo))
+    }
 }
