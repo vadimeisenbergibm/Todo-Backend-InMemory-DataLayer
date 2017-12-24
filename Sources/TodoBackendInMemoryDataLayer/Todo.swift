@@ -17,7 +17,7 @@
 import TodoBackendDataLayer
 
 struct TodoImplementation: Todo {
-    var id: Int
+    var id: String
     var title: String
     var order: Int
     var completed: Bool
