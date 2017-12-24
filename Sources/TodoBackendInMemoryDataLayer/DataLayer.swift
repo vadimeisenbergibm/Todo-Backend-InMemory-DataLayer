@@ -26,7 +26,7 @@ public struct DataLayer: TodoBackendDataLayer.DataLayer {
         completion(Result.success(Array(todos.values)))
     }
 
-    public mutating func add(title: String, order: Int, completed: Bool,
+    public mutating func add(title: String, order: Int?, completed: Bool,
                              completion: (Result<Todo>) -> Void) {
         let id = idGenerator.generate()
         let todo = TodoImplementation(id: id, title: title, order: order, completed: completed)
