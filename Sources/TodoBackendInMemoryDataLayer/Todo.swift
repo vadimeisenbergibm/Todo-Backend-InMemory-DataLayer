@@ -19,6 +19,6 @@ import TodoBackendDataLayer
 struct TodoImplementation: Todo {
     var id: String
     var title: String
-    var order: Int
+    var order: Int?
     var completed: Bool
 }
