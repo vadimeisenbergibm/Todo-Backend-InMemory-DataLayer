@@ -18,4 +18,19 @@ import TodoBackendDataLayer
 
 public struct DataLayer: TodoBackendDataLayer.DataLayer {
     public init() {}
+
+    private var idGenerator = IDGenerator()
+    private var todos: [String: TodoImplementation] = [String: TodoImplementation]()
+
+    public func get(completion: (Result<[Todo]>) -> Void) {
+        completion(Result.Success(Array(todos.values)))
+    }
+
+    public mutating func add(title: String, order: Int, completed: Bool,
+                             completion: (Result<Todo>) -> Void) {
+        let id = idGenerator.generate()
+        let todo = TodoImplementation(id: id, title: title, order: order, completed: completed)
+        todos[id] = todo
+        completion(Result.Success(todo))
+    }
 }
