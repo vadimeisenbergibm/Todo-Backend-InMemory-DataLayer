@@ -25,7 +25,8 @@ let package = Package(
             targets: ["TodoBackendInMemoryDataLayer"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vadimeisenbergibm/Todo-Backend-DataLayer.git", .upToNextMajor(from: "0.0.0")),
+      .package(url: "https://github.com/vadimeisenbergibm/Todo-Backend-DataLayer.git",
+                 .upToNextMajor(from: "0.0.0")),
     ],
     targets: [
         .target(
