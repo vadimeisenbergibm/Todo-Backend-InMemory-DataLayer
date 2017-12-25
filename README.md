@@ -3,6 +3,7 @@
 ![Linux](https://img.shields.io/badge/os-linux-green.svg?style=flat)
 ![Apache 2](https://img.shields.io/badge/license-Apache2-blue.svg?style=flat)
 [![codebeat badge](https://codebeat.co/badges/57cd2bc1-8f54-410c-93e4-7ebf15f0883b)](https://codebeat.co/projects/github-com-vadimeisenbergibm-todo-backend-inmemory-datalayer-master)
+[![codecov](https://codecov.io/gh/vadimeisenbergibm/Todo-Backend-InMemory-DataLayer/branch/master/graph/badge.svg)](https://codecov.io/gh/vadimeisenbergibm/Todo-Backend-InMemory-DataLayer)
 
 # Todo-Backend-InMemory-DataLayer
 In-memory data layer for https://github.com/vadimeisenbergibm/Todo-Backend-DataLayer
