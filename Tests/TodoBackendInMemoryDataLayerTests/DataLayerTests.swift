@@ -22,10 +22,34 @@ class DataLayerTests: XCTestCase {
     static var allTests: [(String, (DataLayerTests) -> () throws -> Void)] {
         return [
             ("testInitializer", testInitializer),
+            ("testAddItem", testAddItem),
         ]
     }
 
     func testInitializer() {
         let _ = DataLayer()
+    }
+
+    func testAddItem() {
+        let dataLayer = DataLayer()
+        let testExpectation = expectation(description: "Add first item")
+
+        let testTitle = "Reticulate splines"
+        let testOrder = 0
+        let testCompleted = false
+
+        dataLayer.add(title: testTitle, order: testOrder, completed: testCompleted) { result in
+            switch result {
+            case .success(let todo):
+                XCTAssertEqual(todo.title, testTitle, "wrong title")
+                XCTAssertEqual(todo.order, testOrder, "wrong order")
+                XCTAssertEqual(todo.completed, testCompleted, "wrong completed")
+            case .failure(let error):
+                XCTFail("Unexpected error: \(error)")
+            }
+            testExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
     }
 }
