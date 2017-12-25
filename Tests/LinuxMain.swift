@@ -18,5 +18,5 @@ import XCTest
 @testable import TodoBackendInMemoryDataLayerTests
 
 XCTMain([
-           testCase(TodoBackendInMemoryDataLayerTests.allTests)
+           testCase(DataLayerTests.allTests)
        ])
