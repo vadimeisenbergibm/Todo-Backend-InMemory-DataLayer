@@ -32,5 +32,7 @@ let package = Package(
         .target(
             name: "TodoBackendInMemoryDataLayer",
             dependencies: ["TodoBackendDataLayer"]),
+        .testTarget(name: "TodoBackendInMemoryDataLayerTests",
+                    dependencies: ["TodoBackendInMemoryDataLayer"]),
     ]
 )
