@@ -16,6 +16,8 @@
 
 import XCTest
 import Foundation
+
+import TodoBackendDataLayer
 import TodoBackendInMemoryDataLayer
 
 class DataLayerTests: XCTestCase {
@@ -30,24 +32,53 @@ class DataLayerTests: XCTestCase {
         let _ = DataLayer()
     }
 
+    private func checkSingleTodoResult(_ result: Result<Todo>, expectedTitle: String, expectedCompleted: Bool, expectedOrder: Int? = nil, expectedID: String? = nil) {
+        switch result {
+        case .success(let todo):
+            XCTAssertEqual(todo.title, expectedTitle, "wrong title")
+            XCTAssertEqual(todo.completed, expectedCompleted, "wrong completed")
+            XCTAssertEqual(todo.order, expectedOrder, "wrong order")
+        case .failure(let error):
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
     func testAddItem() {
         let dataLayer = DataLayer()
-        let testExpectation = expectation(description: "Add first item")
+        let testExpectation = expectation(description: #function)
 
-        let testTitle = "Reticulate splines"
-        let testOrder = 0
-        let testCompleted = false
+        let title = "Reticulate splines"
+        let order = 0
+        let completed = false
 
-        dataLayer.add(title: testTitle, order: testOrder, completed: testCompleted) { result in
-            switch result {
-            case .success(let todo):
-                XCTAssertEqual(todo.title, testTitle, "wrong title")
-                XCTAssertEqual(todo.order, testOrder, "wrong order")
-                XCTAssertEqual(todo.completed, testCompleted, "wrong completed")
+        dataLayer.add(title: title, order: order, completed: completed) { result in
+            checkSingleTodoResult(result, expectedTitle: title, expectedCompleted: completed,
+                                  expectedOrder: order)
+            testExpectation.fulfill()
+        }
+
+        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
+    }
+
+    func testGetItem() {
+        let dataLayer = DataLayer()
+        let testExpectation = expectation(description: #function)
+
+        let title = "Reticulate splines"
+        let order = 0
+        let completed = false
+
+        dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+            switch resultOfAdd {
+            case .success(let addedTodo):
+                dataLayer.get(id: addedTodo.id) { resultOfGet in
+                    checkSingleTodoResult(resultOfGet, expectedTitle: title, expectedCompleted: completed, expectedOrder: order, expectedID: addedTodo.id)
+                    testExpectation.fulfill()
+                }
             case .failure(let error):
                 XCTFail("Unexpected error: \(error)")
+                 testExpectation.fulfill()
             }
-            testExpectation.fulfill()
         }
 
         waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
