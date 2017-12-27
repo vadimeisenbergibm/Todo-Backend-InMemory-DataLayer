@@ -125,7 +125,7 @@ class DataLayerTests: XCTestCase {
         dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
             switch resultOfAdd {
             case .success(let addedTodo):
-                dataLayer.get(id: addedTodo.id) { resultOfGet in
+                dataLayer.get() { resultOfGet in
                     checkSingleTodoResult(resultOfGet, expectedTitle: title, expectedCompleted: completed, expectedOrder: order, expectedID: addedTodo.id)
                     testExpectation.fulfill()
                 }
