@@ -32,12 +32,42 @@ class DataLayerTests: XCTestCase {
         let _ = DataLayer()
     }
 
-    private func checkSingleTodoResult(_ result: Result<Todo>, expectedTitle: String, expectedCompleted: Bool, expectedOrder: Int? = nil, expectedID: String? = nil) {
+    private func check(todo: Todo, expectedTitle: String, expectedCompleted: Bool,
+                       expectedOrder: Int? = nil, expectedID: String? = nil) {
+        XCTAssertEqual(todo.title, expectedTitle, "wrong title")
+        XCTAssertEqual(todo.completed, expectedCompleted, "wrong completed")
+        if let expectedOrder = expectedOrder {
+            XCTAssertEqual(todo.order, expectedOrder, "wrong order")
+        }
+        if let expectedID = expectedID {
+            XCTAssertEqual(todo.id, expectedID, "wrong ID")
+        }
+    }
+
+    private func checkSingleTodoResult(_ result: Result<Todo>, expectedTitle: String,
+                                       expectedCompleted: Bool, expectedOrder: Int? = nil,
+                                       expectedID: String? = nil) {
         switch result {
         case .success(let todo):
-            XCTAssertEqual(todo.title, expectedTitle, "wrong title")
-            XCTAssertEqual(todo.completed, expectedCompleted, "wrong completed")
-            XCTAssertEqual(todo.order, expectedOrder, "wrong order")
+            check(todo: todo, expectedTitle: expectedTitle, expectedCompleted: expectedCompleted,
+            expectedOrder: expectedOrder)
+        case .failure(let error):
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    private func checkSingleTodoResult(_ result: Result<[Todo]>, expectedTitle: String,
+                                       expectedCompleted: Bool, expectedOrder: Int? = nil,
+                                       expectedID: String? = nil) {
+        switch result {
+        case .success(let todos):
+            XCTAssertEqual(todos.count, 1)
+            guard let todo = todos.first else {
+                XCTFail("The returned todo items do not have the first member")
+                return
+            }
+            check(todo: todo, expectedTitle: expectedTitle, expectedCompleted: expectedCompleted,
+                  expectedOrder: expectedOrder)
         case .failure(let error):
             XCTFail("Unexpected error: \(error)")
         }
@@ -78,6 +108,30 @@ class DataLayerTests: XCTestCase {
             case .failure(let error):
                 XCTFail("Unexpected error: \(error)")
                  testExpectation.fulfill()
+            }
+        }
+
+        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
+    }
+
+    func testGetItems() {
+        let dataLayer = DataLayer()
+        let testExpectation = expectation(description: #function)
+
+        let title = "Reticulate splines"
+        let order = 0
+        let completed = false
+
+        dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+            switch resultOfAdd {
+            case .success(let addedTodo):
+                dataLayer.get(id: addedTodo.id) { resultOfGet in
+                    checkSingleTodoResult(resultOfGet, expectedTitle: title, expectedCompleted: completed, expectedOrder: order, expectedID: addedTodo.id)
+                    testExpectation.fulfill()
+                }
+            case .failure(let error):
+                XCTFail("Unexpected error: \(error)")
+                testExpectation.fulfill()
             }
         }
 
