@@ -73,6 +73,20 @@ class DataLayerTests: XCTestCase {
         }
     }
 
+    private func checkError(_ result: Result<Todo>, expectedError: DataLayerError) {
+        switch result {
+        case .success(let todo):
+            XCTFail("Received todo instead of failure, todo: \(todo)")
+        case .failure(let error):
+            switch(error, expectedError) {
+            case (.internalError, .internalError), (.todoNotFound, .todoNotFound):
+                break
+            default:
+                XCTFail("Wrong error:  expected \(expectedError), received \(error)")
+            }
+        }
+    }
+
     func testAddItem() {
         let dataLayer = DataLayer()
         let testExpectation = expectation(description: #function)
@@ -133,6 +147,19 @@ class DataLayerTests: XCTestCase {
                 XCTFail("Unexpected error: \(error)")
                 testExpectation.fulfill()
             }
+        }
+
+        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
+    }
+
+    func testNotFoundItemInEmptyTodos() {
+        let dataLayer = DataLayer()
+        let testExpectation = expectation(description: #function)
+
+
+        dataLayer.get(id: "dummyID") { result in
+            checkError(result, expectedError: .todoNotFound)
+            testExpectation.fulfill()
         }
 
         waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
