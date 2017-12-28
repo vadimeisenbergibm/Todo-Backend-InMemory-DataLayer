@@ -30,7 +30,10 @@ class DataLayerTests: XCTestCase {
             ("testNotFoundItemInEmptyTodos", testNotFoundItemInEmptyTodos),
             ("testWrongTodoId", testWrongTodoId),
             ("testDeleteItem", testDeleteItem),
-            ("testDeleteItems", testDeleteItems)
+            ("testDeleteItems", testDeleteItems),
+            ("testUpdateTitle", testUpdateTitle),
+            ("testUpdateCompleted", testUpdateCompleted),
+            ("testUpdateOrder", testUpdateOrder)
         ]
     }
 
@@ -245,5 +248,53 @@ class DataLayerTests: XCTestCase {
                 }
             }
         }
+    }
+
+    private func runTestUpdate(newTitle: String? = nil, newOrder: Int? = nil,
+                               newCompleted: Bool? = nil) {
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
+
+            dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+                switch resultOfAdd {
+                case .success(let addedTodo):
+                    dataLayer.update(id: addedTodo.id, title: newTitle, order: newOrder,
+                                     completed: newCompleted) { resultOfUpdate in
+                                        let expectedTitle = newTitle ?? title
+                                        let expectedOrder = newOrder ?? order
+                                        let expectedCompleted = newCompleted ?? completed
+                                        checkSingleTodoResult(resultOfUpdate,
+                                            expectedTitle: expectedTitle,
+                                            expectedCompleted: expectedCompleted,
+                                            expectedOrder: expectedOrder, expectedID: addedTodo.id)
+                                        dataLayer.get(id: addedTodo.id) { resultOfGet in
+                                            checkSingleTodoResult(resultOfUpdate,
+                                                expectedTitle: expectedTitle,
+                                                expectedCompleted: expectedCompleted,
+                                                expectedOrder: expectedOrder,
+                                                expectedID: addedTodo.id)
+                                            testExpectation.fulfill()
+                                        }
+                    }
+                case .failure(let error):
+                    XCTFail("Unexpected error: \(error)")
+                    testExpectation.fulfill()
+                }
+            }
+        }
+    }
+
+    func testUpdateTitle() {
+        runTestUpdate(newTitle: "Check what does it mean to reticulate splines")
+    }
+
+    func testUpdateCompleted() {
+        runTestUpdate(newCompleted: true)
+    }
+
+    func testUpdateOrder() {
+        runTestUpdate(newOrder: 7)
     }
 }
