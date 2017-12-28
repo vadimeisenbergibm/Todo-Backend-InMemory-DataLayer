@@ -28,7 +28,9 @@ class DataLayerTests: XCTestCase {
             ("testGetItem", testGetItem),
             ("testGetItems", testGetItems),
             ("testNotFoundItemInEmptyTodos", testNotFoundItemInEmptyTodos),
-            ("testWrongTodoId", testWrongTodoId)
+            ("testWrongTodoId", testWrongTodoId),
+            ("testDeleteItem", testDeleteItem),
+            ("testDeleteItems", testDeleteItems)
         ]
     }
 
@@ -72,6 +74,15 @@ class DataLayerTests: XCTestCase {
             }
             check(todo: todo, expectedTitle: expectedTitle, expectedCompleted: expectedCompleted,
                   expectedOrder: expectedOrder)
+        case .failure(let error):
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+
+    private func checkNoErrorResult(_ result: Result<Void>) {
+        switch result {
+        case .success():
+            break
         case .failure(let error):
             XCTFail("Unexpected error: \(error)")
         }
@@ -179,6 +190,54 @@ class DataLayerTests: XCTestCase {
                     dataLayer.get(id: "dummyID") { resultOfGet in
                         checkError(resultOfGet, expectedError: .todoNotFound)
                         testExpectation.fulfill()
+                    }
+                case .failure(let error):
+                    XCTFail("Unexpected error: \(error)")
+                    testExpectation.fulfill()
+                }
+            }
+        }
+    }
+
+    func testDeleteItem() {
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
+
+            dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+                switch resultOfAdd {
+                case .success(let addedTodo):
+                    dataLayer.delete(id: addedTodo.id) { resultOfDelete in
+                        checkNoErrorResult(resultOfDelete)
+                        dataLayer.get(id: addedTodo.id) { resultOfGet in
+                            checkError(resultOfGet, expectedError: .todoNotFound)
+                            testExpectation.fulfill()
+                        }
+                    }
+                case .failure(let error):
+                    XCTFail("Unexpected error: \(error)")
+                    testExpectation.fulfill()
+                }
+            }
+        }
+    }
+
+    func testDeleteItems() {
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
+
+            dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+                switch resultOfAdd {
+                case .success(let addedTodo):
+                    dataLayer.delete() { resultOfDelete in
+                        checkNoErrorResult(resultOfDelete)
+                        dataLayer.get(id: addedTodo.id) { resultOfGet in
+                            checkError(resultOfGet, expectedError: .todoNotFound)
+                            testExpectation.fulfill()
+                        }
                     }
                 case .failure(let error):
                     XCTFail("Unexpected error: \(error)")
