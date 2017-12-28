@@ -29,6 +29,8 @@ class DataLayerTests: XCTestCase {
             ("testGetItems", testGetItems),
             ("testNotFoundItemInEmptyTodos", testNotFoundItemInEmptyTodos),
             ("testWrongTodoId", testWrongTodoId),
+            ("testNotFoundItemInUpdateOfEmptyTodos", testNotFoundItemInUpdateOfEmptyTodos),
+            ("testWrongTodoIdInUpdate", testWrongTodoIdInUpdate),
             ("testDeleteItem", testDeleteItem),
             ("testDeleteItems", testDeleteItems),
             ("testUpdateTitle", testUpdateTitle),
@@ -192,6 +194,37 @@ class DataLayerTests: XCTestCase {
                 case .success:
                     dataLayer.get(id: "dummyID") { resultOfGet in
                         checkError(resultOfGet, expectedError: .todoNotFound)
+                        testExpectation.fulfill()
+                    }
+                case .failure(let error):
+                    XCTFail("Unexpected error: \(error)")
+                    testExpectation.fulfill()
+                }
+            }
+        }
+    }
+
+    func testNotFoundItemInUpdateOfEmptyTodos() {
+        runDataLayerTest() { dataLayer, testExpectation in
+            dataLayer.update(id: "dummyID", title: "dummy", order: nil, completed: nil) { result in
+                checkError(result, expectedError: .todoNotFound)
+                testExpectation.fulfill()
+            }
+        }
+    }
+
+    func testWrongTodoIdInUpdate() {
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
+
+            dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+                switch resultOfAdd {
+                case .success:
+                    dataLayer.update(id: "dummyID", title: "dummy", order: nil, completed: nil) {
+                        resultOfUpdate in
+                        checkError(resultOfUpdate, expectedError: .todoNotFound)
                         testExpectation.fulfill()
                     }
                 case .failure(let error):
