@@ -90,81 +90,79 @@ class DataLayerTests: XCTestCase {
         }
     }
 
+    typealias DataLayerTest = (TodoBackendInMemoryDataLayer.DataLayer, XCTestExpectation) -> Void
+    private func runDataLayerTest(dataLayerTest: DataLayerTest) {
+        let dataLayer = DataLayer()
+        let testExpectation = expectation(description: "run test")
+
+        dataLayerTest(dataLayer, testExpectation)
+        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
+    }
+
     func testAddItem() {
-        let dataLayer = DataLayer()
-        let testExpectation = expectation(description: #function)
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
 
-        let title = "Reticulate splines"
-        let order = 0
-        let completed = false
-
-        dataLayer.add(title: title, order: order, completed: completed) { result in
-            checkSingleTodoResult(result, expectedTitle: title, expectedCompleted: completed,
-                                  expectedOrder: order)
-            testExpectation.fulfill()
-        }
-
-        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
-    }
-
-    func testGetItem() {
-        let dataLayer = DataLayer()
-        let testExpectation = expectation(description: #function)
-
-        let title = "Reticulate splines"
-        let order = 0
-        let completed = false
-
-        dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
-            switch resultOfAdd {
-            case .success(let addedTodo):
-                dataLayer.get(id: addedTodo.id) { resultOfGet in
-                    checkSingleTodoResult(resultOfGet, expectedTitle: title, expectedCompleted: completed, expectedOrder: order, expectedID: addedTodo.id)
-                    testExpectation.fulfill()
-                }
-            case .failure(let error):
-                XCTFail("Unexpected error: \(error)")
-                 testExpectation.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
-    }
-
-    func testGetItems() {
-        let dataLayer = DataLayer()
-        let testExpectation = expectation(description: #function)
-
-        let title = "Reticulate splines"
-        let order = 0
-        let completed = false
-
-        dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
-            switch resultOfAdd {
-            case .success(let addedTodo):
-                dataLayer.get() { resultOfGet in
-                    checkSingleTodoResult(resultOfGet, expectedTitle: title, expectedCompleted: completed, expectedOrder: order, expectedID: addedTodo.id)
-                    testExpectation.fulfill()
-                }
-            case .failure(let error):
-                XCTFail("Unexpected error: \(error)")
+            dataLayer.add(title: title, order: order, completed: completed) { result in
+                checkSingleTodoResult(result, expectedTitle: title, expectedCompleted: completed,
+                                      expectedOrder: order)
                 testExpectation.fulfill()
             }
         }
+    }
 
-        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
+    func testGetItem() {
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
+
+            dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+                switch resultOfAdd {
+                case .success(let addedTodo):
+                    dataLayer.get(id: addedTodo.id) { resultOfGet in
+                        checkSingleTodoResult(resultOfGet, expectedTitle: title,
+                                              expectedCompleted: completed, expectedOrder: order,
+                                              expectedID: addedTodo.id)
+                        testExpectation.fulfill()
+                    }
+                case .failure(let error):
+                    XCTFail("Unexpected error: \(error)")
+                    testExpectation.fulfill()
+                }
+            }
+        }
+    }
+
+    func testGetItems() {
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
+
+            dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+                switch resultOfAdd {
+                case .success(let addedTodo):
+                    dataLayer.get() { resultOfGet in
+                        checkSingleTodoResult(resultOfGet, expectedTitle: title, expectedCompleted: completed, expectedOrder: order, expectedID: addedTodo.id)
+                        testExpectation.fulfill()
+                    }
+                case .failure(let error):
+                    XCTFail("Unexpected error: \(error)")
+                    testExpectation.fulfill()
+                }
+            }
+        }
     }
 
     func testNotFoundItemInEmptyTodos() {
-        let dataLayer = DataLayer()
-        let testExpectation = expectation(description: #function)
-
-
-        dataLayer.get(id: "dummyID") { result in
-            checkError(result, expectedError: .todoNotFound)
-            testExpectation.fulfill()
+        runDataLayerTest() { dataLayer, testExpectation in
+            dataLayer.get(id: "dummyID") { result in
+                checkError(result, expectedError: .todoNotFound)
+                testExpectation.fulfill()
+            }
         }
-
-        waitForExpectations(timeout: 5, handler: { error in XCTAssertNil(error, "Timeout") })
     }
 }
