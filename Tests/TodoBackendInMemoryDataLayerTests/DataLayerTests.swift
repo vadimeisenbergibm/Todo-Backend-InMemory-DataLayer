@@ -28,6 +28,7 @@ class DataLayerTests: XCTestCase {
             ("testGetItem", testGetItem),
             ("testGetItems", testGetItems),
             ("testNotFoundItemInEmptyTodos", testNotFoundItemInEmptyTodos),
+            ("testWrongTodoId", testWrongTodoId)
         ]
     }
 
@@ -162,6 +163,27 @@ class DataLayerTests: XCTestCase {
             dataLayer.get(id: "dummyID") { result in
                 checkError(result, expectedError: .todoNotFound)
                 testExpectation.fulfill()
+            }
+        }
+    }
+
+    func testWrongTodoId() {
+        runDataLayerTest() { dataLayer, testExpectation in
+            let title = "Reticulate splines"
+            let order = 0
+            let completed = false
+
+            dataLayer.add(title: title, order: order, completed: completed) { resultOfAdd in
+                switch resultOfAdd {
+                case .success:
+                    dataLayer.get(id: "dummyID") { resultOfGet in
+                        checkError(resultOfGet, expectedError: .todoNotFound)
+                        testExpectation.fulfill()
+                    }
+                case .failure(let error):
+                    XCTFail("Unexpected error: \(error)")
+                    testExpectation.fulfill()
+                }
             }
         }
     }
