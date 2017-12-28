@@ -25,6 +25,9 @@ class DataLayerTests: XCTestCase {
         return [
             ("testInitializer", testInitializer),
             ("testAddItem", testAddItem),
+            ("testGetItem", testGetItem),
+            ("testGetItems", testGetItems),
+            ("testNotFoundItemInEmptyTodos", testNotFoundItemInEmptyTodos),
         ]
     }
 
