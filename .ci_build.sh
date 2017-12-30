@@ -14,6 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Travis CI build file for Kitura Hello World
+# the script to be used by .travis.yaml
 git clone https://github.com/IBM-Swift/Package-Builder.git
 ./Package-Builder/build-package.sh -projectDir $(pwd)
